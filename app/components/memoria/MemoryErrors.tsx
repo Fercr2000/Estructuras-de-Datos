@@ -1,4 +1,6 @@
 import { CppViewer } from "@/components/ui/CppViewer";
+import { ProsCallout } from "@/components/ui/ProsCallout";
+import { ConsCallout } from "@/components/ui/ConsCallout";
 
 interface MemoryError {
   id: string;
@@ -39,7 +41,7 @@ delete[] arr;`,
     whatIs:
       "Reservas memoria con new y nunca llamas a delete. La memoria queda ocupada hasta que el programa termina. El caso más típico: reasignas un puntero perdiendo la referencia a la memoria anterior.",
     whyDangerous:
-      "No hace que el programa peté inmediatamente, pero si la fuga ocurre dentro de un bucle, tu programa va consumiendo más y más RAM hasta agotarla. En servidores que están encendidos durante semanas, una fuga pequeña acaba tumbando la máquina.",
+      "No hace que el programa pete inmediatamente, pero si la fuga ocurre dentro de un bucle, tu programa va consumiendo más y más RAM hasta agotarla. En servidores que están encendidos durante semanas, una fuga pequeña acaba tumbando la máquina.",
     howToAvoid:
       "Regla mental: por cada new que escribas, prepárate para escribir su delete. Si una clase reserva memoria en su constructor, libérala en su destructor. Si reasignas un puntero, libera primero lo que apuntaba antes.",
     filename: "leak.cpp",
@@ -123,30 +125,15 @@ export function MemoryErrors() {
             <div className="space-y-3">
               <div className="bg-card border border-border-warm rounded-lg p-4">
                 <div className="font-mono text-xs text-amber mb-1">// qué es</div>
-                <p className="text-ink-soft text-sm leading-relaxed">{err.whatIs}</p>
-              </div>
-              <div className="bg-card border border-border-warm rounded-lg p-4">
-                <div
-                  className="font-mono text-xs mb-1"
-                  style={{ color: "#DC2626" }}
-                >
-                  // por qué es peligroso
-                </div>
                 <p className="text-ink-soft text-sm leading-relaxed">
-                  {err.whyDangerous}
+                  {err.whatIs}
                 </p>
               </div>
-              <div className="bg-card border border-border-warm rounded-lg p-4">
-                <div
-                  className="font-mono text-xs mb-1"
-                  style={{ color: "#059669" }}
-                >
-                  // cómo evitarlo
-                </div>
-                <p className="text-ink-soft text-sm leading-relaxed">
-                  {err.howToAvoid}
-                </p>
-              </div>
+              <ConsCallout
+                title="por qué es peligroso"
+                items={[err.whyDangerous]}
+              />
+              <ProsCallout title="cómo evitarlo" items={[err.howToAvoid]} />
             </div>
             <CppViewer filename={err.filename} code={err.code} />
           </div>

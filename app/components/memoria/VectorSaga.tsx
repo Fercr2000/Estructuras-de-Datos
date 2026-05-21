@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { CppViewer } from "@/components/ui/CppViewer";
-import { TechList, TechItem } from "@/components/ui/TechList";
+import { ProsCallout } from "@/components/ui/ProsCallout";
+import { ConsCallout } from "@/components/ui/ConsCallout";
 
 interface VectorVersion {
   id: string;
@@ -35,30 +36,20 @@ const versions: VectorVersion[] = [
     long int tam;
 
 public:
-    VectorInt(long int atam) {
-        mem = new int[tam = atam];
-    }
+    VectorInt(long int atam) { mem = new int[tam = atam]; }
+    ~VectorInt() { delete[] mem; }
 
-    ~VectorInt() {
-        delete[] mem;
-    }
-
-    int leer(long int pos) {
-        return mem[pos];
-    }
-
+    int leer(long int pos) { return mem[pos]; }
     void escribir(long int pos, const int &valor) {
         mem[pos] = valor;
     }
 };`,
     usageFilename: "uso_int.cpp",
     usageCode: `VectorInt arr(100);
-
 for (int c = 0; c < 100; c++)
     arr.escribir(c, 0);
 
 VectorInt arr2(50);
-
 for (int c = 0; c < 50; c++)
     arr2.escribir(c, arr.leer(c));`,
     pros: [
@@ -66,7 +57,7 @@ for (int c = 0; c < 50; c++)
       "El destructor libera automáticamente la memoria del heap cuando el objeto desaparece.",
     ],
     cons: [
-      "Solo sirve para enteros. Si queremos almacenar floats, hay que duplicar todo.",
+      "Solo sirve para enteros. Si queremos almacenar floats, hay que duplicar toda la clase.",
     ],
     conclusion:
       "Funciona, pero la limitación está clara: solo enteros. Si necesitamos otro tipo, ¿qué hacemos?",
@@ -85,18 +76,10 @@ for (int c = 0; c < 50; c++)
     long int tam;
 
 public:
-    VectorFloat(long int atam) {
-        mem = new float[tam = atam];
-    }
+    VectorFloat(long int atam) { mem = new float[tam = atam]; }
+    ~VectorFloat() { delete[] mem; }
 
-    ~VectorFloat() {
-        delete[] mem;
-    }
-
-    float leer(long int pos) {
-        return mem[pos];
-    }
-
+    float leer(long int pos) { return mem[pos]; }
     void escribir(long int pos, const float &valor) {
         mem[pos] = valor;
     }
@@ -113,9 +96,7 @@ float x = arr.leer(0);
 // quiero un vector de strings?
 // ¿Y de mis propios objetos?
 // ¿Una clase para cada tipo?`,
-    pros: [
-      "Funciona para floats.",
-    ],
+    pros: ["Funciona para floats."],
     cons: [
       "Duplicación masiva: el código es idéntico salvo el tipo.",
       "Si arreglamos un bug en una versión, hay que repetirlo en todas las demás.",
@@ -131,7 +112,7 @@ float x = arr.leer(0);
     badgeColor: "#EA580C",
     title: "Quitar el tipo del todo (void*)",
     intro:
-      "Primer intento de solución: que el vector no use ningún tipo concreto. Internamente guardamos un puntero a void (sin tipo) y el tamaño en bytes de cada elemento. Para leer y escribir copiamos bloques de memoria con memcpy. Funciona... pero el uso resulta horrible: hay que pasar punteros y tamaños manualmente, perder toda la seguridad de tipos y hacer castings constantemente.",
+      "Primer intento de solución: que el vector no use ningún tipo concreto. Internamente guardamos un puntero a void (sin tipo) y el tamaño en bytes de cada elemento. Para leer y escribir copiamos bloques de memoria con memcpy. Funciona... pero el uso resulta horrible: hay que pasar punteros y tamaños manualmente, perdemos toda la seguridad de tipos y debemos hacer castings constantemente.",
     filename: "Vector.h",
     code: `class Vector {
     void *mem;
@@ -139,51 +120,47 @@ float x = arr.leer(0);
     long int tamdato;
 
 public:
-    Vector(long int atam, long int atamdato) {
-        tam = atam;
-        tamdato = atamdato;
-        mem = new char[tamdato * tam];
-    }
-
+    Vector(long int atam, long int atamdato);
     ~Vector() { delete[] mem; }
 
     void leer(long int pos, void *dato) {
-        memcpy(dato, (char*)mem + tamdato * pos, tamdato);
+        memcpy(dato, mem + tamdato * pos, tamdato);
     }
-
     void escribir(long int pos, const void *dato) {
-        memcpy((char*)mem + tamdato * pos, dato, tamdato);
+        memcpy(mem + tamdato * pos, dato, tamdato);
     }
-};`,
+};
+
+// Constructor definido fuera de la clase
+Vector::Vector(long int atam, long int atamdato) {
+    tam = atam;
+    tamdato = atamdato;
+    mem = new char[tamdato * tam];
+}`,
     usageFilename: "uso_void.cpp",
-    usageCode: `Vector ai(10, sizeof(int));
-Vector af(25, sizeof(float));
+    usageCode: `int main() {
+    Vector ai(10, sizeof(int));
+    Vector af(25, sizeof(float));
+    int itmp = 5;
+    float ftmp = 2.3;
 
-int itmp = 5;
-float ftmp = 2.3;
+    ai.escribir(3, &itmp);
+    af.escribir(7, &ftmp);
 
-// Hay que pasar tamaños y punteros
-// manualmente: feo y peligroso
-ai.escribir(3, &itmp);
-af.escribir(7, &ftmp);
+    ai.leer(3, &itmp);
+    af.leer(7, &ftmp);
 
-ai.leer(3, &itmp);
-af.leer(7, &ftmp);
-
-// Si te equivocas de tamaño o de tipo,
-// el compilador no te dice nada.
-// Crash en ejecución.`,
-    pros: [
-      "Una sola clase para cualquier tipo.",
-    ],
+    return 0;
+}`,
+    pros: ["Una sola clase para cualquier tipo de dato."],
     cons: [
       "Sintaxis tediosa: hay que pasar punteros y sizeof a todo.",
-      "Sin comprobación de tipos: el compilador no te avisa si metes la pata.",
+      "Sin comprobación de tipos: el compilador no avisa si metes la pata.",
       "Errores que solo aparecen en ejecución (y a veces ni eso: corrupción silenciosa).",
-      "No es nada elegante. Programar así da dolor de cabeza.",
+      "Implementar y usar este tipo de clases es tedioso y propenso a errores.",
     ],
     conclusion:
-      "Funciona pero es horrible de usar. Tiene que haber una forma de tener una sola clase reutilizable y mantener la seguridad de tipos.",
+      "Funciona pero es horrible de usar. Tiene que haber una forma de tener una sola clase reutilizable manteniendo la seguridad de tipos.",
   },
   {
     id: "template",
@@ -200,36 +177,27 @@ class Vector {
     long int tam;
 
 public:
-    Vector(long int atam) {
-        mem = new T[tam = atam];
-    }
+    Vector(long int atam) { mem = new T[tam = atam]; }
+    ~Vector() { delete[] mem; }
 
-    ~Vector() {
-        delete[] mem;
-    }
-
-    T leer(long int pos) {
-        return mem[pos];
-    }
-
+    T leer(long int pos) { return mem[pos]; }
     void escribir(long int pos, const T &valor) {
         mem[pos] = valor;
     }
 };`,
     usageFilename: "uso_template.cpp",
-    usageCode: `Vector<int> ai(10);
-Vector<float> af(25);
+    usageCode: `int main() {
+    Vector<int> ai(10);
+    Vector<float> af(25);
 
-ai.escribir(3, 5);
-af.escribir(7, 2.3);
+    ai.escribir(3, 5);
+    af.escribir(7, 2.3);
 
-cout << ai.leer(3) << " "
-     << af.leer(7) << endl;
+    cout << ai.leer(3) << " "
+         << af.leer(7) << endl;
 
-// Una sola clase. Cualquier tipo.
-// Comprobación estricta de tipos:
-// ai.escribir(3, "hola"); // ¡Error
-//                         // de compilación!`,
+    return 0;
+}`,
     pros: [
       "Una sola clase reutilizable para cualquier tipo.",
       "Comprobación de tipos estricta en tiempo de compilación.",
@@ -238,7 +206,7 @@ cout << ai.leer(3) << " "
     ],
     cons: [
       "El código del template tiene que ir entero en el fichero de cabecera (.h).",
-      "Mensajes de error de compilación pueden ser largos y enrevesados.",
+      "Los mensajes de error de compilación pueden ser largos y enrevesados.",
     ],
     conclusion:
       "Esta es la solución correcta y la que vamos a usar a partir de aquí en todas las estructuras de datos. Los templates son una de las herramientas más potentes de C++.",
@@ -251,7 +219,6 @@ export function VectorSaga() {
 
   return (
     <div>
-      {/* Selector de pestañas */}
       <div className="flex flex-wrap gap-1.5 mb-6 border-b border-border-warm pb-3">
         {versions.map((version, i) => {
           const isActive = i === activeIdx;
@@ -272,7 +239,6 @@ export function VectorSaga() {
         })}
       </div>
 
-      {/* Contenido de la versión activa */}
       <div className="space-y-5">
         <div className="flex items-baseline gap-3">
           <span
@@ -301,33 +267,11 @@ export function VectorSaga() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-3 pt-2">
-          <div className="bg-card border border-border-warm rounded-lg p-4">
-            <div className="font-mono text-xs text-amber mb-2">// ventajas</div>
-            <TechList>
-              {v.pros.map((p, i) => (
-                <TechItem key={i} bullet="→">
-                  {p}
-                </TechItem>
-              ))}
-            </TechList>
-          </div>
-          <div className="bg-card border border-border-warm rounded-lg p-4">
-            <div className="font-mono text-xs text-amber mb-2">
-              // inconvenientes
-            </div>
-            <TechList>
-              {v.cons.map((c, i) => (
-                <TechItem key={i} bullet="→">
-                  {c}
-                </TechItem>
-              ))}
-            </TechList>
-          </div>
+          <ProsCallout items={v.pros} />
+          <ConsCallout items={v.cons} />
         </div>
 
-        <div
-          className="relative bg-card border border-border-warm rounded-lg p-5 overflow-hidden"
-        >
+        <div className="relative bg-card border border-border-warm rounded-lg p-5 overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[2px]"
             style={{ background: "var(--gradient-amber)" }}

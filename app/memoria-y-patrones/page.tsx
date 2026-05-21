@@ -6,6 +6,7 @@ import { PointerWalkthrough } from "@/components/memoria/PointerWalkthrough";
 import { MemoryErrors } from "@/components/memoria/MemoryErrors";
 import { BestPractices } from "@/components/memoria/BestPractices";
 import { VectorSaga } from "@/components/memoria/VectorSaga";
+import { TemplateExplained } from "@/components/memoria/TemplateExplained";
 import { Operators } from "@/components/memoria/Operators";
 import { OperatorsCheatsheet } from "@/components/memoria/OperatorsCheatsheet";
 
@@ -316,39 +317,104 @@ export default function MemoriaPatronesPage() {
           subtitle="Vamos a construir paso a paso una clase Vector en C++, viendo los problemas que aparecen y cómo se resuelven. El recorrido tiene cuatro etapas: dos intentos sencillos pero limitados, un experimento feo pero educativo, y por fin la solución correcta. Es exactamente el camino histórico que recorrió C++ hasta llegar a los templates."
         />
         <VectorSaga />
-        <div className="mt-6 relative bg-card border border-border-warm rounded-lg p-5 overflow-hidden">
+      </section>
+
+      <hr className="divider-gradient mb-20" />
+
+      {/* Cómo funcionan los templates */}
+      <section className="mb-20">
+        <SectionHeader
+          comment="como_funcionan_templates"
+          title="Cómo funcionan los templates"
+          subtitle="Una vez vista la solución, conviene entender bien qué hace exactamente C++ cuando escribimos un template. Es un mecanismo poderoso pero peculiar: lo que escribimos no es directamente código compilado, sino un molde a partir del cual el compilador fabrica clases reales bajo demanda."
+        />
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="relative bg-card border border-border-warm rounded-lg p-6 overflow-hidden">
+            <div
+              className="absolute top-0 left-0 right-0 h-[2px]"
+              style={{ background: "var(--gradient-amber)" }}
+            />
+            <h3 className="font-serif text-xl mb-3">Una plantilla, no una clase</h3>
+            <p className="text-ink-soft leading-relaxed">
+              Cuando escribes un template, no estás creando una clase. Estás
+              creando una <strong>receta</strong> para fabricar clases. El
+              compilador no la traduce a código máquina por sí sola: necesita
+              que alguien la "instancie" indicando con qué tipo concreto. Hasta
+              que no aparece <span className="font-mono text-sm">Vector&lt;int&gt;</span>{" "}
+              en algún sitio, la plantilla no produce código.
+            </p>
+          </div>
+          <div className="relative bg-card border border-border-warm rounded-lg p-6 overflow-hidden">
+            <div
+              className="absolute top-0 left-0 right-0 h-[2px]"
+              style={{ background: "var(--gradient-amber)" }}
+            />
+            <h3 className="font-serif text-xl mb-3">Una clase por cada tipo</h3>
+            <p className="text-ink-soft leading-relaxed">
+              Cuando escribes{" "}
+              <span className="font-mono text-sm">Vector&lt;int&gt;</span> y{" "}
+              <span className="font-mono text-sm">Vector&lt;float&gt;</span> en
+              tu programa, el compilador genera dos clases distintas: una
+              específica para int y otra específica para float. Son tipos
+              completamente diferentes: un{" "}
+              <span className="font-mono text-sm">Vector&lt;int&gt;</span> no
+              es asignable a un{" "}
+              <span className="font-mono text-sm">Vector&lt;float&gt;</span>.
+              Esto es lo que llamamos "seguridad de tipos".
+            </p>
+          </div>
+        </div>
+
+        <TemplateExplained />
+
+        <div className="mt-8 relative bg-card border border-border-warm rounded-lg p-5 overflow-hidden">
           <div
             className="absolute top-0 left-0 right-0 h-[2px]"
             style={{ background: "var(--gradient-amber)" }}
           />
-          <h3 className="font-serif text-xl mb-2">
-            Cómo se implementan los templates
-          </h3>
-          <p className="text-ink-soft leading-relaxed text-sm mb-3">
-            Dos detalles importantes sobre los templates en C++:
-          </p>
-          <ul className="space-y-2 text-sm text-ink-soft">
-            <li>
-              <span className="text-amber-hover font-mono">→</span> Todo el
-              código de un template tiene que ir en el fichero de cabecera
-              (.h). El compilador necesita ver la implementación completa para
-              poder generar cada versión específica.
+          <h3 className="font-serif text-xl mb-3">Tres detalles importantes</h3>
+          <ul className="space-y-3 text-sm text-ink-soft">
+            <li className="flex gap-3">
+              <span className="font-mono text-amber-hover shrink-0">→</span>
+              <span className="leading-relaxed">
+                <strong className="text-ink">Todo en el .h.</strong> Los
+                templates tienen que ir enteros (declaración e implementación)
+                en el fichero de cabecera. No hay fichero .cpp aparte. El motivo
+                es técnico: el compilador necesita ver el código fuente
+                completo cada vez que aparece una nueva instanciación.
+              </span>
             </li>
-            <li>
-              <span className="text-amber-hover font-mono">→</span> Cuando una
-              función del template se define fuera de la clase, hay que repetir
-              la declaración{" "}
-              <span className="font-mono text-amber-hover">template&lt;class T&gt;</span>{" "}
-              y usar{" "}
-              <span className="font-mono text-amber-hover">Vector&lt;T&gt;::</span>{" "}
-              en lugar de solo{" "}
-              <span className="font-mono text-amber-hover">Vector::</span>.
+            <li className="flex gap-3">
+              <span className="font-mono text-amber-hover shrink-0">→</span>
+              <span className="leading-relaxed">
+                <strong className="text-ink">
+                  Definir métodos fuera de la clase.
+                </strong>{" "}
+                Cuando una función del template se define fuera de la
+                declaración de la clase, hay que repetir{" "}
+                <span className="font-mono text-amber-hover">
+                  template&lt;class T&gt;
+                </span>{" "}
+                y usar{" "}
+                <span className="font-mono text-amber-hover">
+                  Vector&lt;T&gt;::
+                </span>{" "}
+                en lugar de solo{" "}
+                <span className="font-mono text-amber-hover">Vector::</span>.
+              </span>
             </li>
-            <li>
-              <span className="text-amber-hover font-mono">→</span> Podemos
-              hacer cualquier suposición sobre T en el código (por ejemplo, que
-              soporta el operador &lt;). Si alguien instancia el template con
-              un tipo que no lo cumple, el compilador dará un error allí.
+            <li className="flex gap-3">
+              <span className="font-mono text-amber-hover shrink-0">→</span>
+              <span className="leading-relaxed">
+                <strong className="text-ink">
+                  Puedes asumir cosas sobre T.
+                </strong>{" "}
+                Si en tu código escribes{" "}
+                <span className="font-mono text-amber-hover">a &lt; b</span> con
+                dos objetos de tipo T, estás asumiendo que T soporta el
+                operador &lt;. Si alguien instancia tu template con un tipo que
+                no lo soporta, el compilador dará un error en ese punto.
+              </span>
             </li>
           </ul>
         </div>
@@ -395,63 +461,6 @@ export default function MemoriaPatronesPage() {
         <OperatorsCheatsheet />
         <div className="mt-10">
           <Operators />
-        </div>
-      </section>
-
-      <hr className="divider-gradient mb-20" />
-
-      {/* Cierre */}
-      <section className="mb-12">
-        <SectionHeader
-          comment="cierre"
-          title="Lo que nos llevamos"
-          subtitle="Con estas tres herramientas (memoria dinámica, templates y operadores) tenemos todo lo necesario para empezar a implementar estructuras de datos serias."
-        />
-        <div
-          className="relative bg-card border border-border-warm rounded-lg p-6 overflow-hidden"
-        >
-          <div
-            className="absolute top-0 left-0 right-0 h-[2px]"
-            style={{ background: "var(--gradient-amber)" }}
-          />
-          <p className="text-ink leading-relaxed mb-4">
-            Tres ideas a interiorizar antes de seguir:
-          </p>
-          <ul className="space-y-3 text-ink-soft">
-            <li className="flex gap-3">
-              <span className="font-mono text-amber-hover shrink-0">→</span>
-              <span className="leading-relaxed">
-                <strong className="text-ink">Diseña la memoria antes que el código.</strong>{" "}
-                Antes de implementar una estructura, decide qué se guarda dónde:
-                qué va en la pila, qué en el heap, quién apunta a quién. Si la
-                gestión de memoria está clara desde el principio, el código sale
-                solo.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span className="font-mono text-amber-hover shrink-0">→</span>
-              <span className="leading-relaxed">
-                <strong className="text-ink">Usa templates desde el primer momento.</strong>{" "}
-                Toda estructura de datos que escribamos va a ser un template,
-                para que pueda almacenar cualquier tipo. Es lo estándar y lo que
-                hace la STL de C++ con sus contenedores.
-              </span>
-            </li>
-            <li className="flex gap-3">
-              <span className="font-mono text-amber-hover shrink-0">→</span>
-              <span className="leading-relaxed">
-                <strong className="text-ink">Si reservas memoria, plantéate los tres grandes.</strong>{" "}
-                Cuando una clase usa{" "}
-                <span className="font-mono text-sm">new</span> en su interior,
-                probablemente necesitas implementar destructor, constructor
-                copia y operador=. A esto se le llama la "regla de los tres" y
-                ahorra muchísimos bugs.
-              </span>
-            </li>
-          </ul>
-        </div>
-        <div className="mt-8 text-center font-mono text-sm text-ink-mute">
-          <span className="text-amber">$</span> next: ~/estructuras/vector-dinamico
         </div>
       </section>
     </main>

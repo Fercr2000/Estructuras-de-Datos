@@ -1,5 +1,6 @@
 import { CppViewer } from "@/components/ui/CppViewer";
-import { TechList, TechItem } from "@/components/ui/TechList";
+import { ProsCallout } from "@/components/ui/ProsCallout";
+import { ConsCallout } from "@/components/ui/ConsCallout";
 
 interface Props {
   badge: string;
@@ -39,26 +40,8 @@ export function MemoryTypeCard({
       <p className="text-ink-soft leading-relaxed">{description}</p>
       <CppViewer filename={filename} code={code} />
       <div className="grid md:grid-cols-2 gap-3 pt-2">
-        <div className="bg-card border border-border-warm rounded-lg p-4">
-          <div className="font-mono text-xs text-amber mb-2">// ventajas</div>
-          <TechList>
-            {pros.map((p, i) => (
-              <TechItem key={i} bullet="→">
-                {p}
-              </TechItem>
-            ))}
-          </TechList>
-        </div>
-        <div className="bg-card border border-border-warm rounded-lg p-4">
-          <div className="font-mono text-xs text-amber mb-2">// inconvenientes</div>
-          <TechList>
-            {cons.map((c, i) => (
-              <TechItem key={i} bullet="→">
-                {c}
-              </TechItem>
-            ))}
-          </TechList>
-        </div>
+        <ProsCallout items={pros} />
+        <ConsCallout items={cons} />
       </div>
     </div>
   );

@@ -16,21 +16,23 @@ const operators: OperatorExample[] = [
     id: "bracket",
     badge: "01",
     title: "operator[]",
-    what: "Sobrecargar el operador [] nos permite acceder a las posiciones del vector con la misma sintaxis que un array nativo: v[3] en lugar de v.leer(3). Devuelve una referencia, así que podemos usarlo para leer (x = v[3]) o para escribir (v[3] = 99).",
-    why: "El código se vuelve mucho más natural de leer. Cualquiera que sepa C++ entiende qué hace v[i] sin necesitar leer la documentación de la clase.",
+    what: "Sobrecargar el operador [] nos permite acceder a las posiciones del vector con la misma sintaxis que un array nativo: v[3] en lugar de v.leer(3). Devuelve una referencia, así que podemos usarlo para leer (x = v[3]) o para escribir (v[3] = 99). Este operador sustituye a las operaciones de lectura/escritura que teníamos antes.",
+    why: "El código se vuelve mucho más natural de leer. Cualquiera que sepa C++ entiende qué hace v[i] sin necesidad de leer la documentación de la clase.",
     filename: "operator_brackets.cpp",
     code: `template<class T>
 class Vector {
     T *mem;
     long int tam;
 public:
-    // ... constructor y destructor
+    Vector(long int atam) { mem = new T[tam = atam]; }
+    ~Vector() { delete[] mem; }
 
-    // Devuelve una referencia: vale
-    // tanto para leer como para escribir
-    T &operator[](int pos) {
-        return mem[pos];
-    }
+    // El operador [] sustituye a leer y escribir.
+    // Devuelve una referencia: vale para ambas.
+    T &operator[](int pos) { return mem[pos]; }
+
+    bool operator==(Vector &arr);
+    Vector &operator=(Vector &arr);
 };
 
 // Uso:
@@ -44,28 +46,20 @@ cout << v[3];      // imprimir`,
     badge: "02",
     title: "operator= (el más importante)",
     what: "Sobrecargar el operador = controla qué pasa cuando escribimos v1 = v2. Si no lo definimos, C++ copia campo a campo, lo que significa que ambos vectores apuntarían al mismo bloque de memoria. Cuando uno se destruya y libere ese bloque, el otro quedará apuntando a memoria liberada: bomba de relojería.",
-    why: "Si tu clase reserva memoria con new, casi siempre necesitas un operador= que haga una copia profunda: liberar lo que había, reservar memoria nueva, y copiar los elementos uno a uno. Esto se conoce como la 'regla de los tres': si implementas el destructor, probablemente necesites también el operador= y el constructor copia.",
+    why: "Si tu clase reserva memoria con new, casi siempre necesitas un operator= que haga una copia profunda: liberar lo que había, reservar memoria nueva y copiar los elementos uno a uno. Esto se conoce como la 'regla de los tres': si implementas el destructor, probablemente necesites también el operator= y el constructor copia.",
     warning:
       "Detalle importante: la comprobación 'if (&arr != this)' evita un caso patológico, v = v, en el que estaríamos liberando nuestra propia memoria justo antes de intentar copiar de ella.",
     filename: "operator_assign.cpp",
     code: `template<class T>
 Vector<T>& Vector<T>::operator=(Vector &arr) {
-    // Protección contra auto-asignación
     if (&arr != this) {
-        // 1. Liberar la memoria actual
         delete[] mem;
-
-        // 2. Reservar memoria nueva
         tam = arr.tam;
         mem = new T[tam];
-
-        // 3. Copiar los elementos uno a uno
         for (int c = 0; c < tam; c++) {
             mem[c] = arr.mem[c];
         }
     }
-    // Devolver *this permite encadenar:
-    // v1 = v2 = v3;
     return *this;
 }`,
   },
@@ -73,29 +67,20 @@ Vector<T>& Vector<T>::operator=(Vector &arr) {
     id: "equals",
     badge: "03",
     title: "operator==",
-    what: "Sobrecargar el operador == define qué significa que dos vectores sean iguales. La definición habitual: mismo tamaño y mismos elementos en las mismas posiciones. Si alguno falla, devolvemos false; si todo coincide, true.",
+    what: "Sobrecargar el operator == define qué significa que dos vectores sean iguales. La definición habitual: mismo tamaño y mismos elementos en las mismas posiciones. Si alguno falla, devolvemos false; si todo coincide, true. Es poco común definir este operador sobre un vector pero ilustra bien la idea.",
     why: "Sin esta sobrecarga, el == compararía punteros internos, no contenidos. Dos vectores con los mismos números darían false porque viven en zonas distintas del heap. Definir == permite que el código exprese qué quiere preguntar de verdad.",
     filename: "operator_equals.cpp",
     code: `template<class T>
 bool Vector<T>::operator==(Vector &arr) {
-    // Si los tamaños no coinciden,
-    // no pueden ser iguales
     if (tam != arr.tam)
         return false;
 
-    // Comparar elemento a elemento
     for (int c = 0; c < tam; c++) {
         if (mem[c] != arr.mem[c])
             return false;
     }
-
-    // Todos iguales: son el mismo vector
     return true;
-}
-
-// Uso:
-if (v1 == v2)
-    cout << "iguales" << endl;`,
+}`,
   },
 ];
 
