@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
+@theme {
+  /* Colores cálidos */
+  --color-cream: #FAFAF7;
+  --color-card: #FFFFFF;
+  --color-subtle: #F5F3EE;
+  --color-border-warm: #E8E4DC;
+
+  --color-ink: #1A1A1A;
+  --color-ink-soft: #5C5C5C;
+  --color-ink-mute: #8A8A8A;
+
+  /* Acento ámbar */
+  --color-amber-DEFAULT: #D97706;
+  --color-amber-hover: #B45309;
+  --color-amber-soft: #FEF3C7;
+  --color-amber-light: #FED7AA;
+  --color-amber-bright: #F59E0B;
+
+  /* Semánticos para complejidad */
+  --color-complex-good: #059669;
+  --color-complex-mid: #0284C7;
+  --color-complex-warn: #D97706;
+  --color-complex-bad: #DC2626;
+
+  /* Familias tipográficas */
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-mono), monospace;
+}
+
+/* Gradientes reutilizables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --gradient-amber: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+  --gradient-amber-soft: linear-gradient(135deg, #FEF3C7 0%, #FED7AA 100%);
+  --gradient-sunset: linear-gradient(135deg, #FBBF24 0%, #F97316 50%, #DC2626 100%);
+  --gradient-line: linear-gradient(90deg, transparent 0%, #D97706 50%, transparent 100%);
+  --gradient-glow: radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, transparent 70%);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
+/* Clases utility custom para los gradientes */
+.bg-gradient-amber {
+  background: var(--gradient-amber);
+}
+
+.bg-gradient-amber-soft {
+  background: var(--gradient-amber-soft);
+}
+
+.bg-gradient-sunset {
+  background: var(--gradient-sunset);
+}
+
+.text-gradient-amber {
+  background: var(--gradient-amber);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.divider-gradient {
+  height: 1px;
+  background: var(--gradient-line);
+  border: none;
 }
