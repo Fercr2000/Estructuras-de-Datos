@@ -1,5 +1,5 @@
 "use client";
-
+import { TermBar } from "@/components/ui/TermBar";
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 
@@ -78,16 +78,7 @@ export function ComplexityChart() {
   return (
     <div className="bg-card border border-border-warm rounded-lg overflow-hidden">
       {/* Header tipo terminal */}
-      <div className="flex items-center gap-2 px-4 py-2 bg-subtle border-b border-border-warm">
-        <div className="flex gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]" />
-          <span className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
-        </div>
-        <span className="font-mono text-xs text-ink-mute ml-2">
-          complexity_chart.tsx
-        </span>
-      </div>
+      <TermBar filename="complexity_chart.tsx" />
 
       <div className="p-6 grid lg:grid-cols-[1fr_240px] gap-6">
         {/* SVG */}

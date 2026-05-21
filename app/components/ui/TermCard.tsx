@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
+import { TermBar } from "./TermBar";
 
 interface Props {
   filename?: string;
@@ -17,16 +18,7 @@ export function TermCard({ filename, children, className }: Props) {
         className
       )}
     >
-      {filename && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-subtle border-b border-border-warm">
-          <div className="flex gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]" />
-            <span className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
-          </div>
-          <span className="font-mono text-xs text-ink-mute ml-2">{filename}</span>
-        </div>
-      )}
+      {filename && <TermBar filename={filename} />}
       <div className="p-6">{children}</div>
     </div>
   );

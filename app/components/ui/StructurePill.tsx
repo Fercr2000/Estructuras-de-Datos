@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 interface Props {
   slug: string;
@@ -8,32 +7,16 @@ interface Props {
 }
 
 export function StructurePill({ slug, name, implemented }: Props) {
-  const baseClass = cn(
-    "inline-flex items-center gap-1.5 px-3 py-1 rounded-md border font-mono text-xs transition-all",
-    implemented
-      ? "bg-amber-soft border-amber-light text-amber-hover hover:scale-105 cursor-pointer"
-      : "bg-subtle border-border-warm text-ink-mute"
-  );
+  const className =
+    "inline-flex items-center gap-1.5 px-3 py-1 rounded-md border border-amber-light text-amber-hover font-mono text-xs transition-all bg-gradient-amber-soft hover:scale-105 hover:shadow-sm cursor-pointer";
 
-  const dot = (
-    <span className={implemented ? "text-amber" : "text-ink-mute"}>
-      {implemented ? "●" : "○"}
-    </span>
-  );
-
-  if (implemented) {
-    return (
-      <Link href={`/estructuras/${slug}`} className={baseClass}>
-        {dot}
-        {name}
-      </Link>
-    );
-  }
+  // Si la estructura aún no tiene página, enlazamos a la home (luego ya enlazará a su detalle)
+  const href = implemented ? `/estructuras/${slug}` : "/";
 
   return (
-    <span className={baseClass}>
-      {dot}
+    <Link href={href} className={className}>
+      <span className="text-amber-hover">◆</span>
       {name}
-    </span>
+    </Link>
   );
 }
