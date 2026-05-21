@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { TermBar } from "@/components/ui/TermBar";
+import { ComplexityBadge } from "@/components/ui/ComplexityBadge";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -9,7 +11,6 @@ interface Example {
   code: string;
   steps: string[];
   result: string;
-  color: string;
 }
 
 const examples: Example[] = [
@@ -21,12 +22,11 @@ const examples: Example[] = [
     revisarAlgo();    // O(n)
 }`,
     steps: [
-      "revisarTodo() es O(n²)",
-      "revisarAlgo() es O(n)",
-      "El fragmento toma max(n², n)",
+      "revisarTodo() es O(n²).",
+      "revisarAlgo() es O(n).",
+      "Como solo se ejecuta una de las dos ramas, el coste del fragmento es max(n², n).",
     ],
     result: "O(n²)",
-    color: "#EA580C",
   },
   {
     filename: "nested_loops.cpp",
@@ -37,12 +37,11 @@ for (j = 0; j < n; j++)
 for (k = 0; k < n; k++)
     A[k] = k - 1;`,
     steps: [
-      "Asignación inicial es O(1)",
-      "Doble bucle anidado da O(n²)",
-      "Bucle final O(n) queda absorbido",
+      "La asignación inicial es O(1).",
+      "Los dos bucles anidados dan O(n²): el interno se ejecuta n·(n−1)/2 veces.",
+      "El último bucle es O(n) y queda absorbido por el término mayor.",
     ],
     result: "O(n²)",
-    color: "#EA580C",
   },
   {
     filename: "divide_conquer.cpp",
@@ -56,13 +55,12 @@ for (k = 0; k < n; k++)
     }
 }`,
     steps: [
-      "Caso base: resuelvo() es O(1)",
-      "unirSoluciones() es O(n)",
-      "Recurrencia: T(n) = 2·T(n/2) + c·n",
-      "Resolviendo: T(n) = n·log₂(n)",
+      "Caso base: resuelvo() es O(1).",
+      "unirSoluciones() es O(n).",
+      "La recurrencia queda T(n) = 2·T(n/2) + c·n.",
+      "Resolviéndola, T(n) = n·log₂(n).",
     ],
     result: "O(n log n)",
-    color: "#D97706",
   },
 ];
 
@@ -96,59 +94,55 @@ export function ComplexityCalculation() {
       {examples.map((ex) => (
         <div
           key={ex.filename}
-          className="bg-card border border-border-warm rounded-lg overflow-hidden"
+          className="bg-card border border-border-warm rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
         >
-          <div className="flex items-center gap-2 px-4 py-2 bg-subtle border-b border-border-warm">
-            <div className="flex gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F57]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FEBC2E]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#28C840]" />
-            </div>
-            <span className="font-mono text-xs text-ink-mute ml-2">{ex.filename}</span>
-          </div>
+          <TermBar filename={ex.filename} />
           <div className="grid md:grid-cols-2 gap-0">
-            <div className="border-r border-border-warm">
-              <Editor
-                height={`${ex.code.split("\n").length * 22 + 30}px`}
-                defaultLanguage="cpp"
-                value={ex.code}
-                theme="eedd-light"
-                beforeMount={defineTheme}
-                options={{
-                  readOnly: true,
-                  minimap: { enabled: false },
-                  fontSize: 14,
-                  fontFamily: "var(--font-mono)",
-                  lineNumbers: "on",
-                  scrollBeyondLastLine: false,
-                  folding: false,
-                  renderLineHighlight: "none",
-                  scrollbar: { vertical: "hidden", horizontal: "hidden" },
-                  overviewRulerLanes: 0,
-                  hideCursorInOverviewRuler: true,
-                  domReadOnly: true,
-                  contextmenu: false,
-                }}
-              />
+            {/* Columna del código: centrada verticalmente */}
+            <div className="border-r border-border-warm flex items-center justify-center bg-white py-4">
+              <div className="w-full">
+                <Editor
+                  height={`${ex.code.split("\n").length * 22 + 16}px`}
+                  defaultLanguage="cpp"
+                  value={ex.code}
+                  theme="eedd-light"
+                  beforeMount={defineTheme}
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    fontFamily: "var(--font-mono)",
+                    lineNumbers: "on",
+                    scrollBeyondLastLine: false,
+                    folding: false,
+                    renderLineHighlight: "none",
+                    scrollbar: { vertical: "hidden", horizontal: "hidden" },
+                    overviewRulerLanes: 0,
+                    hideCursorInOverviewRuler: true,
+                    domReadOnly: true,
+                    contextmenu: false,
+                    padding: { top: 8, bottom: 8 },
+                  }}
+                />
+              </div>
             </div>
+
+            {/* Columna de análisis */}
             <div className="p-5 flex flex-col">
               <div className="font-mono text-xs text-amber mb-3">// análisis</div>
               <ol className="space-y-2 flex-1">
                 {ex.steps.map((s, i) => (
                   <li key={i} className="flex gap-3 text-sm">
-                    <span className="font-mono text-amber shrink-0">{i + 1}.</span>
+                    <span className="font-mono text-amber shrink-0">
+                      {String(i + 1).padStart(2, "0")}.
+                    </span>
                     <span className="text-ink leading-relaxed">{s}</span>
                   </li>
                 ))}
               </ol>
               <div className="mt-4 pt-4 border-t border-border-warm flex items-center gap-3">
                 <span className="font-mono text-xs text-ink-mute">resultado</span>
-                <span
-                  className="font-mono text-base font-medium px-3 py-1 rounded-md"
-                  style={{ color: ex.color, backgroundColor: `${ex.color}15` }}
-                >
-                  {ex.result}
-                </span>
+                <ComplexityBadge label={ex.result} size="md" />
               </div>
             </div>
           </div>
