@@ -27,7 +27,9 @@ export function Navbar() {
         {/* Menú */}
         <div className="flex items-center gap-2 md:gap-7">
           <NavLink href="/fundamentos">~/fundamentos</NavLink>
+          <NavLink href="/memoria-y-patrones">~/memoria-y-patrones</NavLink>
           <NavLink href="/">~/estructuras</NavLink>
+          
         </div>
       </div>
 
